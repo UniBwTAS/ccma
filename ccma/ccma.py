@@ -1,17 +1,52 @@
 """
-Curvature Corrected Moving Average (CCMA)
+CURVATURE CORRECTED MOVING AVERAGE (CCMA)
 
-The CCMA is a model-free filtering technique designed for 2D and 3D paths. It
+The CCMA is a model-free general-purpose smoothing algorithm designed for 2D/3D paths. It
 addresses the issue of the inwards bending phenomenon in curves that commonly occurs with
 conventional moving average filters. The CCMA method employs a symmetric filtering
 approach, avoiding a delay as it is common for state-estimation approaches, e.g. alpha-beta filter.
 
-The implementation includes the ability to filter given points represented as a
-numpy array. Additionally, the method supports filtering the boundaries with
-decreasing filtering width.
+FEATURES:
 
-While the code itself may not provide a complete understanding, further details
-and insights can be found in the paper:
+-----> 1. Versatile Kernel Options:
+
+CCMA provides flexibility in choosing from a variety of kernels, allowing users to tailor
+the smoothing process to their specific needs:
+
+   - **Uniform Kernel:**
+     - A uniform distribution of weights ensures a straightforward and evenly distributed
+     smoothing effect.
+
+   - **Truncated Normal Kernel:**
+     - Utilizes a truncated normal distribution, offering a controllable truncation area
+     with adjustable parameters for precision smoothing.
+
+   - **Pascal's Triangle Kernel:**
+     - Based on the rows of Pascal's triangle, this kernel serves as a discrete version
+     of the normal distribution, providing a unique approach to smoothing.
+
+-----> 2. Boundary Behavior Options:
+
+Choose from different boundary behaviors to customize the filtering process according to
+your application requirements:
+
+   - **Padding:**
+     - Pads the first and last points to preserve the length of the path during filtering.
+
+   - **Wrapping:**
+     - Treats the points as cyclic, creating a seamless transition between the end and
+     the beginning of the path.
+
+   - **Decreased Filtering Width (Fill Boundary):**
+     - Implements filtering with decreased width parameters, preserving the length of
+     the path while smoothing.
+
+   - **None:**
+     - Skips boundary processing, allowing the algorithm to filter points without any
+     length-preserving adjustments.
+
+While the code itself serves as a robust tool, a comprehensive understanding of CCMA,
+its intricacies, and potential applications can be gained by referring to the accompanying paper:
 
 T. Steinecker and H.-J. Wuensche, "A Simple and Model-Free Path Filtering
 Algorithm for Smoothing and Accuracy", in Proc. IEEE Intelligent Vehicles
@@ -45,7 +80,36 @@ def get_unit_vector(vec):
 
 
 class CCMA:
-    def __init__(self, w_ma, w_cc, distrib="normal", rho_ma=0.95, rho_cc=0.95):
+    def __init__(self, w_ma=5, w_cc=3, distrib="pascal", rho_ma=0.95, rho_cc=0.95):
+        """
+        Initialize the SmoothingFilter object with specified parameters.
+
+        Parameters:
+        - w_ma (float): Width parameter for the moving average.
+        - w_cc (float): Width parameter for the curvature correction.
+        - kernel (str, optional): Type of kernel used for filtering. Options include:
+            - "uniform": Uniform distribution of weights.
+            - "normal": Truncated normal distribution with specified truncation area.
+            - "pascal": Kernel based on rows of Pascal's triangle, a discretized version of the normal distribution.
+              (Default is "pascal")
+        - rho_ma (float, optional): Truncation area for the normal distribution in the moving average.
+            (Default is 0.95)
+        - rho_cc (float, optional): Truncation area for the normal distribution in the curvature correction.
+            (Default is 0.95)
+
+        Note:
+        - The 'kernel' parameter specifies the type of kernel used for filtering -- The kernel is the shape of weights that is used for convolution.
+        - 'rho_ma' and 'rho_cc' are relevant only for the "normal" kernel and represent the truncation areas for the respective distributions.
+        - If 'rho' approximates 0, the 'normal' kernel approximates the 'uniform' kernel.
+
+        Example:
+        ```python
+        ccma = CCMA(w_ma=5, w_cc=3, kernel="normal", rho_ma=0.99, rho_cc=0.95)
+        ```
+
+        This example initializes a CCMA object with a normal kernel, specified widths, and truncation areas.
+        """
+
         # Width for moving averages of points and shifts
         self.w_ma = w_ma
         self.w_cc = w_cc
@@ -92,8 +156,34 @@ class CCMA:
 
             return weight_list
 
+        elif self.distrib == "pascal":
+
+            def get_pascal_row(row_index):
+
+                cur_row = [1]
+
+                if row_index == 0:
+                    return cur_row
+
+                prev = get_pascal_row(row_index - 1)
+
+                for idx_ in range(1, len(prev)):
+                    cur = prev[idx_ - 1] + prev[idx_]
+                    cur_row.append(cur)
+
+                cur_row.append(1)
+
+                return cur_row
+
+            for w_i in range(w + 1):
+                pascal_row_index = w_i * 2
+                row = np.array(get_pascal_row(pascal_row_index))
+                weight_list.append(row / np.sum(row))
+
+            return weight_list
+
         else:
-            raise ValueError("Distribution must be either be 'uniform' or 'normal'.")
+            raise ValueError("Distribution must be either be 'uniform', 'pascal' or 'normal'.")
 
     @staticmethod
     def _get_3d_from_2d(points):
@@ -189,7 +279,7 @@ class CCMA:
         points_ma = self._get_ma_points(points, self.weights_ma[w_ma])
 
         if not cc_mode:
-            return points_ma[w_cc + 1:-w_cc - 1]
+            return points_ma
 
         # Calculate curvature vectors & curvatures
         curvature_vectors = self._get_curvature_vectors(points_ma)
@@ -222,31 +312,53 @@ class CCMA:
 
         return points_ccma
 
-    def filter(self, points: np.ndarray, fill_boundary: bool = False, cc_mode: bool = True):
+    def filter(self, points: np.ndarray, mode: str = "padding", cc_mode: bool = True):
         """
-        Filters points based on the CCMA-filtering algorithm.
+        Apply filtering to a set of points using a specified mode.
 
         Parameters:
-            - points (numpy.ndarray): An array of shape (n, 2) or (n, 3) containing the coordinates of points.
-            - fill_boundary (bool, optional): Specifies if the boundaries should be filtered with descending width parameters.
-                                             Defaults to False.
-            - cc_mode (bool, optional): Specifies if curvature-correction is applied.
+        - points (np.ndarray): Input array of points with dimensions nx2 or nx3.
+        - mode (str, optional): Filtering mode. Options include:
+            - "padding": Pad the first and last points to preserve path length.
+            - "wrapping": Treat points as cyclic (wrapping around).
+            - "fill_boundary": Filter with decreased width parameters to preserve length.
+            - "none": Do not preserve length; no pre-processing.
+        - cc_mode (bool, optional): Specifies if curvature correction is active.
 
         Returns:
-            numpy.ndarray: CCMA-filtered point array.
+        - np.ndarray: Filtered points.
+
+        Raises:
+        - ValueError: If the 'mode' parameter is not one of "padding", "wrapping", "none", or "fill_boundary".
+        - ValueError: If the number of 'points' is insufficient.
         """
+
+        if mode not in ["none", "padding", "wrapping", "fill_boundary"]:
+            raise ValueError("Invalid mode! Got :: {mode}. Expected :: none | padding | wrapping | fill_boundary.")
 
         if points.shape[0] < 3:
             raise RuntimeError("At least 3 points are necessary for the CCMA-filtering")
 
+        if mode == "padding":
+            n_padding = self.w_ccma if cc_mode else self.w_ma
+            points = np.row_stack((np.tile(points[0], (n_padding, 1)),
+                                   points,
+                                   np.tile(points[-1], (n_padding, 1))))
+
         if points.shape[0] < self.w_ccma * 2 + 1:
             raise RuntimeError("Not enough points are given for complete filtering!")
+
+        if mode == "wrapping":
+            n_padding = self.w_ccma if cc_mode else self.w_ma
+            points = np.row_stack((points[-n_padding:],
+                                   points,
+                                   points[:n_padding]))
 
         # Convert 2d points to 3d points (if given as 2d)
         if is_2d := (points.shape[1] == 2):
             points = self._get_3d_from_2d(points)
 
-        if not fill_boundary:
+        if not (mode == "fill_boundary"):
             if is_2d:
                 return self._filter(points, w_ma=self.w_ma, w_cc=self.w_cc, cc_mode=cc_mode)[:, 0:2]
             return self._filter(points, w_ma=self.w_ma, w_cc=self.w_cc, cc_mode=cc_mode)
