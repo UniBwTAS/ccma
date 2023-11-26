@@ -302,7 +302,7 @@ class CCMA:
             shift = np.zeros(3)
             for idx_cc in range(2 * w_cc + 1):
                 if curvatures[idx + idx_cc + 1] != 0.0:
-                    u = get_unit_vector(curvature_vectors[idx + idx_cc + 1 - w_cc])
+                    u = get_unit_vector(curvature_vectors[idx + idx_cc + 1])
                     weight = self.weights_cc[w_cc][idx_cc]
                     shift_magnitude = (1 / curvatures[idx + idx_cc + 1]) * (1 / radii_ma[idx + idx_cc + 1] - 1)
                     shift += u * weight * shift_magnitude
@@ -330,7 +330,7 @@ class CCMA:
 
         Raises:
         - ValueError: If the 'mode' parameter is not one of "padding", "wrapping", "none", or "fill_boundary".
-        - ValueError: If the number of 'points' is insufficient.
+        - RuntimeError: If the number of 'points' is insufficient.
         """
 
         if mode not in ["none", "padding", "wrapping", "fill_boundary"]:
