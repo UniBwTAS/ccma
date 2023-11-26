@@ -21,8 +21,8 @@ ma_points = ccma.filter(points, cc_mode=False)
 
 # Visualize results
 plt.plot(*points.T, "r-o", linewidth=3, alpha=0.3, markersize=10, label="original")
-plt.plot(*ccma_points.T, linewidth=6, alpha=1.0, color="orange", label=f"ccma-smoothed ({w_ma}, {w_cc})")
-plt.plot(*ccma_points_wo_padding.T, linewidth=3, alpha=0.5, color="b", label=f"ccma-smoothed with padding ({w_ma}, {w_cc})")
+plt.plot(*ccma_points.T, linewidth=6, alpha=1.0, color="orange", label=f"ccma-smoothed with padding ({w_ma}, {w_cc})")
+plt.plot(*ccma_points_wo_padding.T, linewidth=3, alpha=0.5, color="b", label=f"ccma-smoothed ({w_ma}, {w_cc})")
 plt.plot(*ma_points.T, linewidth=2, alpha=0.5, color="green", label=f"ma-smoothed ({w_ma})")
 
 # General settings

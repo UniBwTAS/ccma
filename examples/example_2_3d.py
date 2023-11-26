@@ -29,11 +29,11 @@ ax = fig.add_subplot(111, projection='3d')
 ax.plot(points[:, 0], points[:, 1], points[:, 2], "r-o", linewidth=1, alpha=0.25, markersize=5, label="original")
 ax.plot(ma_points[:, 0], ma_points[:, 1], ma_points[:, 2], linewidth=1, alpha=0.75, color="green", label=f"ma-smoothed ({w_ma})")
 ax.plot(ccma_points[:, 0], ccma_points[:, 1], ccma_points[:, 2], linewidth=1, alpha=1., color="orange",
-        label=f"ccma-smoothed ({w_ma}, {w_cc})")
+        label=f"ccma-smoothed with padding ({w_ma}, {w_cc})")
 ax.plot(ccma_points_wo_padding[:, 0],
         ccma_points_wo_padding[:, 1],
         ccma_points_wo_padding[:, 2],
-        linewidth=1, alpha=0.5, color="b", label=f"ccma-smoothed with padding ({w_ma}, {w_cc})")
+        linewidth=1, alpha=0.5, color="b", label=f"ccma-smoothed ({w_ma}, {w_cc})")
 
 # Set labels and title
 ax.set_xlabel('X')
