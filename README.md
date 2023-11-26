@@ -17,11 +17,22 @@ or using no boundary strategy at all.
 This adaptability ensures that the implementation caters to a wide range of scenarios and preferences.
 
 While the code itself may not provide a complete understanding, further details
-and insights can be found in the paper:
+and insights can be found in the paper.
 
-*T. Steinecker and H.-J. Wuensche, "A Simple and Model-Free Path Filtering
-Algorithm for Smoothing and Accuracy", in Proc. IEEE Intelligent Vehicles
-Symposium (IV), 2023*
+If you use the CCMA, please cite the original [paper](https://ieeexplore.ieee.org/abstract/document/10186704?casa_token=sCW2rP_gkSUAAAAA:7MEXKPZzc0XU3YpXb6ayjTlCSrhMYROKe40QmfmABCYxmjoopMwrGztIDzH0F-icaJ6V56P9Aw):
+
+```
+@inproceedings{Steinecker23,
+  title={A Simple and Model-Free Path Filtering Algorithm for Smoothing and Accuracy},
+  author={Steinecker, Thomas and Wuensche, Hans-Joachim},
+  booktitle={2023 IEEE Intelligent Vehicles Symposium (IV)},
+  pages={1--7},
+  year={2023},
+  organization={IEEE}
+}
+```
+
+An informative article that simplifies the explanation of CCMA can be found [here](https://medium.com/@steineckertommy/an-accurate-model-free-path-smoothing-algorithm-890fe383d163).
 
 ![alt text](./figures/MA_vs_CCMA.png "Moving Average vs. Curvature Corrected Moving Average")
 
