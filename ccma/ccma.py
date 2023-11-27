@@ -68,10 +68,11 @@ from scipy.stats import norm
 
 
 def get_unit_vector(vec):
-    if (vec_norm := np.linalg.norm(vec)) == 0.0:
+    vec_norm = np.linalg.norm(vec)
+    if vec_norm == 0.0:
         return vec
     else:
-        return vec / np.linalg.norm(vec)
+        return vec / vec_norm
 
 
 # =================================================================================================
@@ -355,7 +356,8 @@ class CCMA:
                                    points[:n_padding]))
 
         # Convert 2d points to 3d points (if given as 2d)
-        if is_2d := (points.shape[1] == 2):
+        is_2d = points.shape[1] == 2
+        if is_2d:
             points = self._get_3d_from_2d(points)
 
         if not (mode == "fill_boundary"):
