@@ -53,3 +53,17 @@ noisy_points = points + noise
 ccma = CCMA(w_ma=5, w_cc=3)
 points_smoothed = ccma.filter(noisy_points)
 ```
+
+### CCMA for Path Interpolation
+
+
+The CCMA was designed for smoothing noisy paths; 
+however, due to its advantageous characteristics and simple usage, 
+we believe that it can serve many more applications, 
+such as path interpolation. In the figure below, 
+it becomes apparent that the CCMA, unlike the MA, 
+reduces both overall and maximum errors. 
+In the list of provided examples you can find an exemplary implementation of path interpolation.
+
+
+![alt text](./figures/inwards_bending.png "The potential of the CCMA as path interpolation.")
