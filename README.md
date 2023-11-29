@@ -1,5 +1,7 @@
 # Curvature Corrected Moving Average (CCMA)
 
+*"The allure of methods guided solely by data."*—ChatGPT
+
 ![alt text](./figures/MA_vs_CCMA.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
 
 The CCMA is a **model-free**, **general-purpose** smoothing algorithm designed for **2D/3D** paths. It
@@ -32,9 +34,8 @@ If you use the CCMA, please cite the original [paper](https://ieeexplore.ieee.or
 }
 ```
 
-An informative article that simplifies the explanation of CCMA can be found [here](https://medium.com/@steineckertommy/an-accurate-model-free-path-smoothing-algorithm-890fe383d163).
+An informative article that simplifies the explanation of the CCMA can be found [here](https://medium.com/@steineckertommy/an-accurate-model-free-path-smoothing-algorithm-890fe383d163).
 
-![alt text](./figures/MA_vs_CCMA.png "Moving Average vs. Curvature Corrected Moving Average")
 
 ### Minimal Working Example
 

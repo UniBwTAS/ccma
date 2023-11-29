@@ -4,7 +4,7 @@ from ccma.ccma import CCMA
 
 # Create a noisy 2d-path
 n = 100
-sigma = 0.1
+sigma = 0.05
 points = np.array([2.0 * np.cos(np.linspace(0, 2 * np.pi, n)),
                    np.sin(np.linspace(0, 6 * np.pi, n))]).T + np.random.normal(0, sigma, (n, 2))
 
