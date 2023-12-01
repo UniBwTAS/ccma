@@ -15,7 +15,7 @@ Steps:
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ccma.ccma import CCMA
+from ccma import CCMA
 import random
 
 

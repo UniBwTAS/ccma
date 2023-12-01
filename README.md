@@ -37,7 +37,7 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 
 ```python
 import numpy as np
-from ccma.ccma import CCMA
+from ccma import CCMA
 
 # Create noisy points on an unit circle
 n = 50
