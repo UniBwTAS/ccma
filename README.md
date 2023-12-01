@@ -13,15 +13,14 @@ The implementation offers a user-friendly experience (see minimal working examle
 making it remarkably easy to apply filtering to given points represented as a numpy array. 
 Users can effortlessly choose from different kernels, including truncated normal, uniform, or the sophisticated Pascal triangle kernel (default).
 
-Furthermore, the implementation provides different boundary behaviors --
-padding, wrapping, decreasing filtering width, 
+Furthermore, the implementation provides different boundary behaviors—padding, wrapping, decreasing filtering width, 
 or using no boundary strategy at all. 
 This adaptability ensures that the implementation caters to a wide range of scenarios and preferences.
 
 While the code itself may not provide a complete understanding, further details
-and insights can be found in the paper.
+and insights can be found in this informative [article](https://medium.com/@steineckertommy/an-accurate-model-free-path-smoothing-algorithm-890fe383d163) or the original [paper](https://ieeexplore.ieee.org/abstract/document/10186704?casa_token=A4esLLLbYm4AAAAA:8gcG8KlNpX7gJkL8EBwkDPNcgBaFPGMbkaRvbJNLbjPrPMT-M61EvUJo27kKlkEkJfxUBnfYpA).
 
-If you use the CCMA, please cite the original [paper](https://ieeexplore.ieee.org/abstract/document/10186704?casa_token=sCW2rP_gkSUAAAAA:7MEXKPZzc0XU3YpXb6ayjTlCSrhMYROKe40QmfmABCYxmjoopMwrGztIDzH0F-icaJ6V56P9Aw):
+If you use the CCMA, please consider citing the original [paper](https://ieeexplore.ieee.org/abstract/document/10186704?casa_token=sCW2rP_gkSUAAAAA:7MEXKPZzc0XU3YpXb6ayjTlCSrhMYROKe40QmfmABCYxmjoopMwrGztIDzH0F-icaJ6V56P9Aw):
 
 ```
 @inproceedings{Steinecker23,
@@ -33,9 +32,6 @@ If you use the CCMA, please cite the original [paper](https://ieeexplore.ieee.or
   organization={IEEE}
 }
 ```
-
-An informative article that simplifies the explanation of the CCMA can be found [here](https://medium.com/@steineckertommy/an-accurate-model-free-path-smoothing-algorithm-890fe383d163).
-
 
 ### Minimal Working Example
 
@@ -68,3 +64,16 @@ In the list of provided examples you can find an exemplary implementation of pat
 
 
 ![alt text](./figures/inwards_bending.png "The potential of the CCMA as path interpolation.")
+
+
+### Further Research Ideas
+
+We believe that the CCMA can serve as a foundation for many extensions in similar or unexpected applications, 
+as its profound methodology can already impress with good results despite its simplicity. 
+In the following, we want to outline a few additional possible research topics related to the CCMA:
+
++ **Improved Boundary Strategies**
++ **Generalization to Higher-Dimensional Data-Points**
++ **Generalization for Surfaces**
++ **Reformulation for Time-Series Data**
++ **Data-Driven Kernels**
