@@ -48,7 +48,7 @@ noisy_points = points + noise
 
 # Create ccma-object and smooth points by using padding (default) and Pascal's Triangle kernel/weights (default)
 ccma = CCMA(w_ma=5, w_cc=3)
-points_smoothed = ccma.filter(noisy_points)
+smoothed_points = ccma.filter(noisy_points)
 ```
 
 ### CCMA for Path Interpolation
@@ -64,6 +64,30 @@ In the list of provided examples you can find an exemplary implementation of pat
 
 
 ![alt text](./figures/inwards_bending.png "The potential of the CCMA as path interpolation.")
+
+
+### Splines vs. CCMA
+
+Splines are commonly chosen for interpolation and smoothing; 
+however, local changes may have global impacts, 
+leading to unexpected or undesired behavior. 
+In contrast, the CCMA is specifically designed to be influenced only by local changes, 
+making it a robust and predictable option. 
+The figure below illustrates this distinction. 
+On the left, it is evident that the CCMA is affected only in the vicinity of the outlier, 
+while the B-Spline oscillates over its entire length. 
+In the right plot, an additional outlier is introduced, once again affecting the CCMA locally. 
+Conversely, the B-Spline undergoes a significant global shape change, 
+with the previous peak increasing and the subsequent oscillations becoming more vivid.
+
+Another noteworthy aspect is the possibility of combining the CCMA and Splines. 
+This results in a continuous function, 
+but the output is more predictable and intuitive compared to B-Splines. 
+In the figure below, the CCMA was applied first, 
+and the outcome was utilized for Spline generation. 
+An illustrative example can also be found in the list of examples.
+
+![alt text](./figures/ccma_vs_bspline.png "B-Spline vs. CCMA + B-Spline")
 
 
 ### Further Research Ideas
