@@ -25,12 +25,12 @@ ccma_points = ccma.filter(points)
 # Fit a 2D Spline to the CCMA-smoothed path
 tck, u = splprep(x=ccma_points.T, s=0, k=3)
 spline_samples = splev(np.linspace(0, 1, 1000), tck)
-plt.plot(spline_samples[0], spline_samples[1], '-', color="magenta", linewidth=4, alpha=1.0, label="CCMA+Spline")
+plt.plot(spline_samples[0], spline_samples[1], '-', color="magenta", linewidth=4, alpha=1.0, label="CCMA + B-Spline")
 
 # Fit a 2D B-Spline to the original data
 tck, u = splprep(x=points.T, s=0.0088, k=3)
 bspline_samples = splev(x=np.linspace(0, 1, 1000), tck=tck)
-plt.plot(bspline_samples[0], bspline_samples[1], 'b-', linewidth=4, alpha=0.75, label="Spline")
+plt.plot(bspline_samples[0], bspline_samples[1], 'b-', linewidth=4, alpha=0.75, label="P-Spline")
 
 # Visualize original points
 plt.plot(*points.T, "k-o", linewidth=2, alpha=0.15, markersize=10, label="Original points")
