@@ -2,7 +2,7 @@
 
 *"The allure of methods guided solely by data."*—ChatGPT
 
-![alt text](./figures/MA_vs_CCMA.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
+![alt text](./figures/MA_VS_CCMA.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
 
 The CCMA is a **model-free**, **general-purpose** smoothing algorithm designed for **2D/3D** paths. It
 addresses the phenomenon of the inwards bending phenomenon in curves that commonly occurs with
