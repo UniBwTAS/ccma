@@ -11,7 +11,8 @@ However, due to its symmetric approach, it primarily serves as accurate smoothin
 
 The implementation offers a user-friendly experience (see minimal working examle), 
 making it remarkably easy to apply filtering to given points represented as a numpy array. 
-Users can effortlessly choose from different kernels, including truncated normal, uniform, or the sophisticated Pascal triangle kernel (default).
+Users can effortlessly choose from different kernels, including truncated normal, hanning, 
+uniform, or the sophisticated Pascal's triangle kernel (default).
 
 Furthermore, the implementation provides different boundary behaviors—padding, wrapping, decreasing filtering width, 
 or using no boundary strategy at all. 

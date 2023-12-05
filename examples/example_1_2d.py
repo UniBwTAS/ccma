@@ -9,9 +9,9 @@ points = np.array([2.0 * np.cos(np.linspace(0, 2 * np.pi, n)),
                    np.sin(np.linspace(0, 6 * np.pi, n))]).T + np.random.normal(0, sigma, (n, 2))
 
 # Create the CCMA-filter object
-w_ma = 10
-w_cc = 3
-ccma = CCMA(w_ma, w_cc)
+w_ma = 4
+w_cc = 2
+ccma = CCMA(w_ma, w_cc, distrib="hanning")
 
 
 # Filter points with and w/o boundaries

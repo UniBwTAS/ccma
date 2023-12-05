@@ -23,7 +23,12 @@ the smoothing process to their specific needs:
 
    - **Pascal's Triangle Kernel:**
      - Based on the rows of Pascal's triangle, this kernel serves as a discrete version
-     of the normal distribution, providing a unique approach to smoothing.
+     of the normal distribution, providing a good compromise between accuracy and smoothness.
+
+   - **Hanning Kernel:**
+     - Is a popular choice in signal processing and produces supersmooth results, but is less accurate.
+     However, combined with curvature correction it can produce outstanding results.
+     - Also known as raised cosine window.
 
 -----> 2. Boundary Behavior Options:
 
@@ -147,15 +152,11 @@ class CCMA:
 
                 weight_list.append(weights)
 
-            return weight_list
-
         elif self.distrib == "uniform":
             for w_i in range(w + 1):
                 weights = np.ones(2 * w_i + 1) * (1 / (2 * w_i + 1))
 
                 weight_list.append(weights)
-
-            return weight_list
 
         elif self.distrib == "pascal":
 
@@ -181,10 +182,20 @@ class CCMA:
                 row = np.array(get_pascal_row(pascal_row_index))
                 weight_list.append(row / np.sum(row))
 
-            return weight_list
+        elif self.distrib == "hanning":
+            def get_hanning_kernel(window_size):
+                # Add two as the first and last element of the hanning kernel is 0.
+                window_size += 2
+                hanning_kernel = (0.5 * (1 - np.cos(2 * np.pi * np.arange(window_size) / (window_size - 1))))[1:-1]
+                return hanning_kernel / np.sum(hanning_kernel)
+
+            for w_i in range(w + 1):
+                weight_list.append(get_hanning_kernel(w_i * 2 + 1))
 
         else:
-            raise ValueError("Distribution must be either be 'uniform', 'pascal' or 'normal'.")
+            raise ValueError("Distribution must be either be 'uniform', 'pascal', 'hanning, or 'normal'.")
+
+        return weight_list
 
     @staticmethod
     def _get_3d_from_2d(points):
