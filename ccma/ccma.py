@@ -95,9 +95,10 @@ class CCMA:
         - w_cc (float): Width parameter for the curvature correction.
         - kernel (str, optional): Type of kernel used for filtering. Options include:
             - "uniform": Uniform distribution of weights.
-            - "normal": Truncated normal distribution with specified truncation area.
+            - "normal": Truncated normal distribution with specified truncation area (see rho_ma and rho_cc).
             - "pascal": Kernel based on rows of Pascal's triangle, a discretized version of the normal distribution.
               (Default is "pascal")
+            - "hanning": The famous hanning kernel, which is most often used in signal processing. Less accurate, but best smoothing characteristics.
         - rho_ma (float, optional): Truncation area for the normal distribution in the moving average.
             (Default is 0.95)
         - rho_cc (float, optional): Truncation area for the normal distribution in the curvature correction.
@@ -193,7 +194,7 @@ class CCMA:
                 weight_list.append(get_hanning_kernel(w_i * 2 + 1))
 
         else:
-            raise ValueError("Distribution must be either be 'uniform', 'pascal', 'hanning, or 'normal'.")
+            raise ValueError("Distribution must either be 'uniform', 'pascal', 'hanning, or 'normal'.")
 
         return weight_list
 
@@ -379,33 +380,72 @@ class CCMA:
             # Define dimension for fast access of relevant dimensions
             dim = 2 if is_2d else 3
 
-            points_ccma = np.zeros((points.shape[0], dim))
-            descending_width_list = self._get_descending_width()
+            # Descending filtering for CCMA
+            if cc_mode:
+                points_ccma = np.zeros((points.shape[0], dim))
+                descending_width_list = self._get_descending_width()[::-1]
+                print(descending_width_list)
 
-            # First and last point
-            points_ccma[0] = points[0, 0:dim]
-            points_ccma[-1] = points[-1, 0:dim]
+                # First and last point
+                points_ccma[0] = points[0, 0:dim]
+                points_ccma[-1] = points[-1, 0:dim]
 
-            # Ascending points
-            for width_set, idx_w in zip(descending_width_list[::-1], range(len(descending_width_list))):
-                w_ccma = width_set["w_ma"] + width_set["w_cc"] + 1
-                points_ccma[idx_w + 1] = self._filter(
-                    points[:idx_w + 1 + w_ccma + 1],
-                    width_set["w_ma"],
-                    width_set["w_cc"],
-                    False if width_set["w_ma"] <= 1 or not cc_mode else True)[:, :dim]
+                # Full-filtered points
+                points_ccma[self.w_ccma: points.shape[0] - self.w_ccma] = self._filter(points, self.w_ma, self.w_cc, cc_mode)[:, :dim]
 
-            # Full-filtered points
-            points_ccma[self.w_ccma: points.shape[0] - self.w_ccma] = self._filter(points, self.w_ma, self.w_cc, cc_mode)[:, :dim]
+                # Ascending/Descending points
+                for width_set, idx_w in zip(descending_width_list, range(len(descending_width_list))):
+                    w_ccma = width_set["w_ma"] + width_set["w_cc"] + 1
 
-            # Descending points
-            for width_set, idx_w in zip(descending_width_list[::-1], range(len(descending_width_list))):
-                w_ccma = width_set["w_ma"] + width_set["w_cc"] + 1
-                points_ccma[-idx_w - 2] = self._filter(
-                    points[-idx_w - 2 - w_ccma:],
-                    width_set["w_ma"],
-                    width_set["w_cc"],
-                    False if width_set["w_ma"] <= 1 or not cc_mode else True)[:, :dim]
+                    # The following is a design choice!
+                    # The second last points are smoothed via MA but are not curvature corrected (you cannot apply both)
+                    # The reason is that curvature correction has no effect without MA>0.
+                    # Consequently, it is better to smooth the second last point instead of doing nothing.
+                    # If, however, global w_ma was set to zero, no MA should be applied (consistency)!
+                    use_ma_1 = True if width_set["w_ma"] == 0 and self.w_ma != 0 else False
 
-            return points_ccma
+                    # Ascending points
+                    points_ccma[idx_w + 1] = self._filter(
+                        points[:idx_w + 1 + w_ccma + 1],
+                        # In case of w_ma==0, do not make curvature correction, but use w_ma==1 instead (this is a design choice)
+                        width_set["w_ma"] if not use_ma_1 else 1,
+                        width_set["w_cc"],
+                        False if use_ma_1 else True)[:, :dim]
+
+                    # Descending points
+                    points_ccma[-idx_w - 2] = self._filter(
+                        points[-idx_w - 2 - w_ccma:],
+                        # In case of w_ma==0, do not make curvature correction, but use w_ma==1 instead (this is a design choice)
+                        width_set["w_ma"] if not use_ma_1 else 1,
+                        width_set["w_cc"],
+                        False if use_ma_1 else True)[:, :dim]
+
+                return points_ccma
+
+            # Descending filtering for MA without curvature correction
+            else:
+                points_ma = np.zeros((points.shape[0], dim))
+                descending_width_list = list(range(self.w_ma))
+
+                # Full-filtered points
+                points_ma[self.w_ma: points.shape[0] - self.w_ma] = self._filter(points, self.w_ma, 0, False)[:, :dim]
+
+                # Ascending/Descending points
+                for idx, width in zip(descending_width_list, descending_width_list):
+
+                    # Ascending points
+                    points_ma[idx] = self._filter(
+                        points[:2 * width + 1],
+                        width,
+                        0,
+                        False)[:, :dim]
+
+                    # Descending points
+                    points_ma[- idx - 1] = self._filter(
+                        points[-2 * width - 1:],
+                        width,
+                        0,
+                        False)[:, :dim]
+
+                return points_ma
 
