@@ -52,6 +52,8 @@ ccma = CCMA(w_ma=5, w_cc=3)
 smoothed_points = ccma.filter(noisy_points)
 ```
 
+Further information can be found in the [HowTo Guide](./docs/HowTo.md).
+
 ### CCMA for Path Interpolation
 
 
