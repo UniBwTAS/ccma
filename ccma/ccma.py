@@ -193,6 +193,10 @@ class CCMA:
             for w_i in range(w + 1):
                 weight_list.append(get_hanning_kernel(w_i * 2 + 1))
 
+        elif callable(self.distrib):
+            for w_i in range(w + 1):
+                weight_list.append(self.distrib(w_i * 2 + 1))
+
         else:
             raise ValueError("Distribution must either be 'uniform', 'pascal', 'hanning, or 'normal'.")
 
