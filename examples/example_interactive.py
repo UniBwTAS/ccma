@@ -1,12 +1,16 @@
 """
 Interactive Example:
 
-- Begin the program script and enhance your comprehension of CCMA
+- Start the script and enhance your comprehension of CCMA
   by dynamically adjusting the parameters in real-time.
 - Observe that the uniform distribution performs poorly for both MA and CCMA,
   highlighting the importance of choosing suitable kernels.
 - Recognize the superior accuracy of the Pascal triangle kernel compared to Hanning.
   However, be mindful that the Pascal kernel tends to be more accurate while sacrificing some smoothness.
+
+Path Description
+- The path consists of multiple straight lines, an arc, a sinus curve and a discontinuous jump.
+- Consequently, the path provides C0-, C1- and C2-discontinuities.
 """
 
 import matplotlib.pyplot as plt

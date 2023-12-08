@@ -92,6 +92,20 @@ An illustrative example can also be found in the list of examples.
 
 ![alt text](./figures/ccma_vs_bspline.png "B-Spline vs. CCMA + B-Spline")
 
+### Interactive Example for Better Understanding
+
+
+The most effective way to learn a new concept is through interaction. 
+That's why we've incorporated an [interactive example](./examples/example_interactive.py) 
+where you can experiment with different kernels and their parameters. 
+Additionally, you have the flexibility to adjust the noise and density of the path. 
+Finally, you can zoom in and move around, 
+facilitating a more profound understanding. 
+We hope you find this tool helpful.
+
+
+![alt text](./figures/interactive_example.gif "Interactive Example")
+
 
 ### Further Research Ideas
 
