@@ -259,8 +259,9 @@ class CCMA:
             for k in range(1, w + 1):
                 radii_ma[idx] += 2 * np.cos(alphas[idx] * k) * weights[w + k]
 
+            # TODO :: Maybe add a warning if the threshold gets active.
             # Apply threshold to MA-estimated radius to avoid unstable correction (-> limited correction)(see paper)
-            radii_ma[idx] = max(0.5, radii_ma[idx])
+            radii_ma[idx] = max(0.35, radii_ma[idx])
 
         return radii_ma
 
