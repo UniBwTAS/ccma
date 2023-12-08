@@ -47,7 +47,7 @@ ccma = CCMA(distrib="normal", rho_ma=0.95, rho_cc=0.9)
 
 #### Custom Kernels
 
-If the provided kernels don't meet your requirements, define your own kernel function:
+If the provided kernels don't meet your requirements, define your own [kernel](https://en.wikipedia.org/wiki/Window_function) function:
 
 ```python
 ccma = CCMA(distrib=get_triangle_kernel)
@@ -89,7 +89,7 @@ ccma = CCMA(mode="fill_boundary", w_ma=1, w_cc=2)
 
 ### Apply Moving Average Without Curvature Correction
 
-To apply only the moving average without curvature correction, set `cc_mode` to False:
+To apply only the moving average without curvature correction, set `cc_mode` to `False`:
 
 ```python
 ccma = CCMA()
