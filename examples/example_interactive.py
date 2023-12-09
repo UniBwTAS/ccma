@@ -19,8 +19,15 @@ import numpy as np
 from ccma import CCMA
 
 
+def close_points(points):
+    """
+    The first point is concatenated to the end of the sequence to get a closed representation.
+    """
+    return np.vstack([points, points[0]])
+
+
 class InteractiveUpdater:
-    def __init__(self, sigma_init=.025, w_ma_init=4, w_cc_init=2, rho_init=0.1, distrib_init="hanning"):
+    def __init__(self, sigma_init=.005, w_ma_init=4, w_cc_init=2, rho_init=0.05, distrib_init="hanning"):
         self.w_ma = w_ma_init
         self.w_cc = w_cc_init
         self.sigma = sigma_init
@@ -44,10 +51,11 @@ class InteractiveUpdater:
 
         ax_checkboxes = plt.axes([0.05, 0.35, 0.15, 0.2])
 
-        self.slider_w_ma = Slider(ax_w_ma, 'w_ma', 0, 15, valinit=self.w_ma, valstep=1)
-        self.slider_w_cc = Slider(ax_w_cc, 'w_cc', 0, 15, valinit=self.w_cc, valstep=1)
-        self.slider_sigma = Slider(ax_sigma, 'sigma', 0, 0.075, valinit=0.025)
-        self.slider_rho = Slider(ax_rho, 'rho', 0.05, 0.2, valinit=self.rho)
+        # Set ranges and initial values for sliders
+        self.slider_w_ma = Slider(ax_w_ma, 'w_ma', 0, 20, valinit=self.w_ma, valstep=1)
+        self.slider_w_cc = Slider(ax_w_cc, 'w_cc', 0, 20, valinit=self.w_cc, valstep=1)
+        self.slider_sigma = Slider(ax_sigma, 'sigma', 0, 0.075, valinit=self.sigma)
+        self.slider_rho = Slider(ax_rho, 'rho', 0.05, 0.15, valinit=self.rho)
         self.slider_zoom = Slider(ax_zoom, 'zoom', 1, 20, valinit=1)
         self.slider_x = Slider(ax_x, 'shift_x', -1, 1, valinit=0)
         self.slider_y = Slider(ax_y, 'shift_y', -1, 1, valinit=0)
@@ -61,6 +69,7 @@ class InteractiveUpdater:
         self.slider_x.on_changed(self.update)
         self.slider_y.on_changed(self.update)
 
+        # Set checkboxes for kernels
         self.checkbox_labels = ['hanning', 'pascal', 'uniform']
         self.checkboxes = CheckButtons(
             ax=ax_checkboxes,
@@ -77,6 +86,7 @@ class InteractiveUpdater:
         self.ax.set_ylim([-1.25, 1.25])
         self.ax.set_facecolor((0.95, 0.95, 0.95))
 
+        # Reduce the size of the plot to make space for sliders.
         box = self.ax.get_position()
         self.ax.set_position([box.x0 + 0.1, box.y0 + 0.2, box.width, box.height * 0.8])
 
@@ -119,12 +129,14 @@ class InteractiveUpdater:
         start = np.array([-2.0, 0])
         end = np.array([-2.0, 1])
         dist = np.linalg.norm(start - end)
-        points.append(np.linspace(start, end, int(dist / self.rho))[1:-1])
+        points.append(np.linspace(start, end, int(dist / self.rho))[:-1])
 
+        # Concatenate points and add noise
         self.points = np.row_stack(points)
         noise = np.random.normal(0, self.sigma, self.points.shape)
         self.noisy_points = self.points + noise
 
+        # Get boundaries of plot -- important for zoom and sliding option
         self.x_max = max(self.points[:, 0]) + 0.25
         self.x_min = min(self.points[:, 0]) - 0.25
 
@@ -161,10 +173,10 @@ class InteractiveUpdater:
 
         # Visualize results
         self.ax.clear()
-        self.ax.plot(*self.points.T, 'ro', markersize=4, alpha=0.25, label=f"original points")
-        self.ax.plot(*self.noisy_points.T, "k-o", linewidth=1, alpha=0.15, markersize=6, label="noisy points")
-        self.ax.plot(*ccma_points.T, linewidth=3, alpha=0.53, color="b", label=f"ccma-smoothed")
-        self.ax.plot(*ma_points.T, linewidth=3, alpha=0.35, color="green", label=f"ma-smoothed")
+        self.ax.plot(*self.points.T, 'ro', markersize=4, alpha=0.5, label=f"original points")
+        self.ax.plot(*close_points(self.noisy_points).T, "k-o", linewidth=1, alpha=0.15, markersize=6, label="noisy points")
+        self.ax.plot(*close_points(ccma_points).T, linewidth=4, alpha=0.5, color="b", label=f"ccma-smoothed")
+        self.ax.plot(*close_points(ma_points).T, linewidth=4, alpha=0.5, color="green", label=f"ma-smoothed")
 
         # General settings
         self.ax.grid(True, color="white", linewidth=2)
