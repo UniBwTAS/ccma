@@ -1,10 +1,10 @@
-# Curvature Corrected Moving Average (CCMA)
+![alt text](./figures/ccma_logo.png "CCMA Logo")
 
 *"The allure of methods guided solely by data."*—ChatGPT
 
 ![alt text](./figures/MA_VS_CCMA.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
 
-The CCMA is a **model-free**, **general-purpose** smoothing algorithm designed for **2D/3D** paths. It
+The Curvature Corrected Moving Average (CCMA) is a **model-free**, **general-purpose** smoothing algorithm designed for **2D/3D** paths. It
 addresses the phenomenon of the inwards bending phenomenon in curves that commonly occurs with
 conventional moving average filters. The CCMA method employs a **symmetric filtering**.
 However, due to its symmetric approach, it primarily serves as accurate smoothing rather than state estimation.
