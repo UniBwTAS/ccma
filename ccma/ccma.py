@@ -86,14 +86,14 @@ def get_unit_vector(vec):
 
 
 class CCMA:
-    def __init__(self, w_ma=5, w_cc=3, distrib="pascal", rho_ma=0.95, rho_cc=0.95):
+    def __init__(self, w_ma=5, w_cc=3, distrib="pascal", distrib_ma=None, distrib_cc=None, rho_ma=0.95, rho_cc=0.95):
         """
         Initialize the SmoothingFilter object with specified parameters.
 
         Parameters:
         - w_ma (float): Width parameter for the moving average.
         - w_cc (float): Width parameter for the curvature correction.
-        - kernel (str, optional): Type of kernel used for filtering. Options include:
+        - distrib (str, optional): Type of kernel used for filtering. Options include:
             - "uniform": Uniform distribution of weights.
             - "normal": Truncated normal distribution with specified truncation area (see rho_ma and rho_cc).
             - "pascal": Kernel based on rows of Pascal's triangle, a discretized version of the normal distribution.
@@ -123,20 +123,24 @@ class CCMA:
         # Overall width (+1 -> see paper)
         self.w_ccma = w_ma + w_cc + 1
 
-        # Distribution of weights. Either truncated normal distribution or uniform distribution.
-        self.distrib = distrib
+        # Distribution of weights for smoothing (ma) and curvature correction (cc).
+        # If neither distrib_ma nor distrib_cc is set, general distrib is used.
+        self.distrib_ma = distrib_ma if distrib_ma else distrib
+        self.distrib_cc = distrib_cc if distrib_cc else distrib
+
         # Truncation value. The larger the width, the larger rho should be chosen.
         self.rho_ma = rho_ma
         self.rho_cc = rho_cc
 
         # Calculate the weights
-        self.weights_ma = self._get_weights(w_ma, rho_ma)
-        self.weights_cc = self._get_weights(w_cc, rho_cc)
+        self.weights_ma = self._get_weights(w_ma, self.distrib_ma, rho_ma)
+        self.weights_cc = self._get_weights(w_cc, self.distrib_cc, rho_cc)
 
-    def _get_weights(self, w, rho):
+    @staticmethod
+    def _get_weights(w, distrib, rho):
         weight_list = []
 
-        if self.distrib == "normal":
+        if distrib == "normal":
             # Get start/end of truncated normal distribution
             x_start = norm.ppf((1 - rho) / 2)
             x_end = norm.ppf(1 - ((1 - rho) / 2))
@@ -153,13 +157,13 @@ class CCMA:
 
                 weight_list.append(weights)
 
-        elif self.distrib == "uniform":
+        elif distrib == "uniform":
             for w_i in range(w + 1):
                 weights = np.ones(2 * w_i + 1) * (1 / (2 * w_i + 1))
 
                 weight_list.append(weights)
 
-        elif self.distrib == "pascal":
+        elif distrib == "pascal":
 
             def get_pascal_row(row_index):
 
@@ -183,7 +187,7 @@ class CCMA:
                 row = np.array(get_pascal_row(pascal_row_index))
                 weight_list.append(row / np.sum(row))
 
-        elif self.distrib == "hanning":
+        elif distrib == "hanning":
             def get_hanning_kernel(window_size):
                 # Add two as the first and last element of the hanning kernel is 0.
                 window_size += 2
@@ -193,9 +197,9 @@ class CCMA:
             for w_i in range(w + 1):
                 weight_list.append(get_hanning_kernel(w_i * 2 + 1))
 
-        elif callable(self.distrib):
+        elif callable(distrib):
             for w_i in range(w + 1):
-                weight_list.append(self.distrib(w_i * 2 + 1))
+                weight_list.append(distrib(w_i * 2 + 1))
 
         else:
             raise ValueError("Distribution must either be 'uniform', 'pascal', 'hanning, or 'normal'.")

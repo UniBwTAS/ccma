@@ -66,11 +66,34 @@ def get_triangle_kernel(width):
     return triangle_kernel
 ```
 
-Note: Kernel width is always an odd value (e.g., 1, 3, 5, ...).
+> [!NOTE]  
+> Kernel width is always an odd value (e.g., 1, 3, 5, ...).
 
-#### Hints
+> [!TIP]  
+> Start with `pascal` or `hanning` for general use. Avoid `uniform` unless you have specific requirements.
 
-- Start with `pascal` or `hanning` for general use. Avoid `uniform` unless you have specific requirements.
+
+#### Customize Kernels for Smoothing and Curvature Correction Individually 
+
+If you wish to employ distinct kernels for smoothing and curvature correction, 
+you have the flexibility to do so by specifying `distrib_ma` and `distrib_cc`. 
+In scenarios where both `distrib_ma` and `distrib` are set, 
+the former takes precedence. The same rule applies to `distrib_cc`.
+
+```python
+ccma = CCMA(w_ma=5, w_cc=2, distrib_ma="hanning")
+```
+
+In this example, the `hanning` kernel is designated for smoothing, 
+while the `pascal` kernel is automatically assigned for curvature correction since no specific `distrib_cc` is set. 
+Consequently, the default `distrib` specification, which is set to `pascal`, 
+is utilized for curvature correction.
+
+> [!TIP]  
+> Using `hanning`for smoothing and `pascal` for curvature correction can be a strategic approach.
+> Leveraging the beneficial characteristics of the `hanning` kernel for smoothing 
+> and then the accuracy of the `pascal` kernel for curvature reconstruction.
+
 
 ### Boundary Strategies
 
@@ -85,6 +108,13 @@ Example:
 
 ```python
 ccma = CCMA(mode="fill_boundary", w_ma=1, w_cc=2)
+```
+
+This would result in the following decreasing filtering parameters at the boundaries: 
+
+```python3
+>>> ccma._get_descending_width()
+[{'w_ma': 1, 'w_cc': 1}, {'w_ma': 1, 'w_cc': 0}, {'w_ma': 0, 'w_cc': 0}]
 ```
 
 ### Apply Moving Average Without Curvature Correction
