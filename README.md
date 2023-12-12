@@ -1,8 +1,11 @@
 ![alt text](./figures/ccma_logo.png "CCMA Logo")
 
-*"The allure of methods guided solely by data."*—ChatGPT
 
-![alt text](./figures/MA_VS_CCMA.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
+<div style="text-align: center; background-color: #f0f0f0; padding: 10px; border-radius: 10px;">
+  <i>❞The allure of methods guided solely by data.❞</i>—ChatGPT
+</div>
+
+![alt text](./figures/demo.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
 
 The Curvature Corrected Moving Average (CCMA) is a **model-free**, **general-purpose** smoothing algorithm designed for **2D/3D** paths. It
 addresses the phenomenon of the inwards bending phenomenon in curves that commonly occurs with
@@ -34,6 +37,15 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 }
 ```
 
+### Quick Links
+
++ [Minimal Working Example](#minimal-working-example)
++ [HowTo Guide](#howto-guide)
++ [CCMA for Path Interpolation](#ccma-for-path-interpolation)
++ [Splines vs. CCMA](#splines-vs-ccma)
++ [Interactive Example for Better Understanding](#interactive-example-for-better-understanding)
++ [Further Research Ideas](#further-research-ideas)
+
 ### Minimal Working Example
 
 ```python
@@ -51,6 +63,8 @@ noisy_points = points + noise
 ccma = CCMA(w_ma=5, w_cc=3)
 smoothed_points = ccma.filter(noisy_points)
 ```
+
+### HowTo Guide
 
 Further information can be found in the [HowTo Guide](./docs/HowTo.md).
 
