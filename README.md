@@ -1,8 +1,9 @@
 ![alt text](./figures/ccma_logo.png "CCMA Logo")
 
+<div  markdown="1" align="center">
 
-<div style="text-align: center; background-color: #f0f0f0; padding: 10px; border-radius: 10px;">
-  <i>❞The allure of methods guided solely by data.❞</i>—ChatGPT
+  `❞The allure of methods guided solely by data.❞—ChatGPT`
+
 </div>
 
 ![alt text](./figures/demo.gif "Moving Average vs. Curvature Corrected Moving Average Visualization")
