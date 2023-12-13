@@ -41,6 +41,7 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 ### Quick Links
 
 + [Minimal Working Example](#minimal-working-example)
++ [Installation](#installation-)
 + [HowTo Guide](#howto-guide)
 + [CCMA for Path Interpolation](#ccma-for-path-interpolation)
 + [Splines vs. CCMA](#splines-vs-ccma)
@@ -64,6 +65,43 @@ noisy_points = points + noise
 ccma = CCMA(w_ma=5, w_cc=3)
 smoothed_points = ccma.filter(noisy_points)
 ```
+
+### Installation 
+
+To effortlessly install CCMA, utilize the following pip command:
+
+```bash
+pip3 install git+https://github.com/UniBwTAS/ccma.git#egg=ccma
+```
+
+or
+
+```bash
+python3 -m pip install git+https://github.com/UniBwTAS/ccma.git#egg=ccma
+```
+
+After a successful installation, ensure the correctness of the setup by following these steps:
+
+1. Open a new terminal window.
+
+2. Launch the Python shell:
+
+    ```python
+    python
+    ```
+
+3. Verify the installation by importing the CCMA module:
+
+    ```python
+    >>> import ccma
+    ```
+
+4. Confirm the version number to ensure a successful installation:
+
+    ```python
+    >>> ccma.__version__
+    "1.0.0"
+    ```
 
 ### HowTo Guide
 
