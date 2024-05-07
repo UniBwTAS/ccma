@@ -41,7 +41,7 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 ### Quick Links
 
 + [Minimal Working Example](#minimal-working-example)
-+ [Installation](#installation-)
++ [Installation](#installation)
 + [HowTo Guide](#howto-guide)
 + [CCMA for Path Interpolation](#ccma-for-path-interpolation)
 + [Splines vs. CCMA](#splines-vs-ccma)
