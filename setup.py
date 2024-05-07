@@ -13,4 +13,5 @@ setup(
         'matplotlib',
         'scipy',
     ],
+    description="Curvature Corrected Moving Average: An accurate and model-free path smoothing algorithm.",
 )
