@@ -393,7 +393,6 @@ class CCMA:
             if cc_mode:
                 points_ccma = np.zeros((points.shape[0], dim))
                 descending_width_list = self._get_descending_width()[::-1]
-                print(descending_width_list)
 
                 # First and last point
                 points_ccma[0] = points[0, 0:dim]
