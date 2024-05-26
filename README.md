@@ -47,6 +47,7 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 + [Splines vs. CCMA](#splines-vs-ccma)
 + [Interactive Example for Better Understanding](#interactive-example-for-better-understanding)
 + [Further Research Ideas](#further-research-ideas)
++ [Star History](#star-history)
 
 ### Minimal Working Example
 
@@ -171,3 +172,7 @@ In the following, we want to outline a few additional possible research topics r
 + **Generalization for Surfaces**
 + **Reformulation for Time-Series Data**
 + **Data-Driven Kernels**
+
+### Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=UniBwTAS/ccma&type=Date)](https://star-history.com/#UniBwTAS/ccma&Date)
