@@ -62,7 +62,7 @@ Symposium (IV), 2023
 # -----   Imports   -------------------------------------------------------------------------------
 # =================================================================================================
 
-from typing import Optional, Union, Callable, List, Dict
+from typing import Optional, Union, Callable, List, Dict, Any
 import numpy as np
 from scipy.stats import norm
 
@@ -92,7 +92,7 @@ def get_unit_vector(vector: np.ndarray) -> np.ndarray:
 
 class CCMA:
     def __init__(self, w_ma: float = 5, w_cc: float = 3, distrib: str = "pascal",
-                 distrib_ma: str = None, distrib_cc: str = None, rho_ma: float = 0.95, rho_cc: float = 0.95):
+                 distrib_ma: str = None, distrib_cc: str = None, rho_ma: float = 0.95, rho_cc: float = 0.95) -> None:
         """
         Initialize the CCMA object with specified parameters.
 
@@ -168,7 +168,7 @@ class CCMA:
             x_start = norm.ppf((1 - rho) / 2)
             x_end = norm.ppf(1 - ((1 - rho) / 2))
 
-            for w_i in range(int(w) + 1):
+            for w_i in range(w + 1):
                 x_values = np.linspace(x_start, x_end, 2 * w_i + 1 + 1)
                 weights = np.zeros((2 * w_i + 1))
 
@@ -181,13 +181,15 @@ class CCMA:
                 weight_list.append(weights)
 
         elif distrib == "uniform":
-            for w_i in range(int(w) + 1):
+            for w_i in range(w + 1):
                 weights = np.ones(2 * w_i + 1) * (1 / (2 * w_i + 1))
+
                 weight_list.append(weights)
 
         elif distrib == "pascal":
 
             def get_pascal_row(row_index):
+
                 cur_row = [1]
 
                 if row_index == 0:
@@ -200,9 +202,10 @@ class CCMA:
                     cur_row.append(cur)
 
                 cur_row.append(1)
+
                 return cur_row
 
-            for w_i in range(int(w) + 1):
+            for w_i in range(w + 1):
                 pascal_row_index = w_i * 2
                 row = np.array(get_pascal_row(pascal_row_index))
                 weight_list.append(row / np.sum(row))
@@ -214,11 +217,11 @@ class CCMA:
                 hanning_kernel = (0.5 * (1 - np.cos(2 * np.pi * np.arange(window_size) / (window_size - 1))))[1:-1]
                 return hanning_kernel / np.sum(hanning_kernel)
 
-            for w_i in range(int(w) + 1):
+            for w_i in range(w + 1):
                 weight_list.append(get_hanning_kernel(w_i * 2 + 1))
 
         elif callable(distrib):
-            for w_i in range(int(w) + 1):
+            for w_i in range(w + 1):
                 weight_list.append(distrib(w_i * 2 + 1))
 
         else:
@@ -313,63 +316,59 @@ class CCMA:
     @staticmethod
     def _get_radii_ma(alphas: np.ndarray, w: float, weights: np.ndarray) -> np.ndarray:
         """
-        Calculate radii for moving average based on alphas and weights.
+        Calculate the moving average of radii based on given angles (alphas) and weights.
 
-        Parameters:
-        - alphas (np.ndarray): Array of alpha values.
-        - w (float): Width parameter.
-        - weights (np.ndarray): Weights for convolution.
+        Parameters
+        ----------
+        alphas : np.ndarray
+            Array of angles between consecutive points.
+        w : int
+            Width parameter for the moving average.
+        weights : np.ndarray
+            Weights used in the moving average calculation.
 
-        Returns:
-        - np.ndarray: Array of radii for moving average.
+        Returns
+        -------
+        np.ndarray
+            Array of moving-average radii.
         """
-        # Offset for convolution
-        pad = np.zeros(int(w))
-        alphas = np.concatenate([pad, alphas, pad])
+        radii_ma = np.zeros_like(alphas)
 
-        return 1 / np.convolve(alphas, weights, mode='valid')
+        for idx in range(1, len(alphas) - 1):
+            radii_ma[idx] = weights[w]
+            for k in range(1, w + 1):
+                radii_ma[idx] += 2 * np.cos(alphas[idx] * k) * weights[w + k]
 
-    @staticmethod
-    def _shift_points(points: np.ndarray, curvatures: np.ndarray, radii_ma: np.ndarray) -> np.ndarray:
+            # TODO :: Maybe add a warning if the threshold gets active.
+            # Apply threshold to MA-estimated radius to avoid unstable correction (-> limited correction)(see paper)
+            radii_ma[idx] = max(0.35, radii_ma[idx])
+
+        return radii_ma
+
+    def _get_descending_width(self) -> List[Dict[str, int]]:
         """
-        Apply shifts to points based on curvature and moving average radii.
+        Reduces the width parameters `w_ma` and `w_cc` until both parameters are 0.
 
-        Parameters:
-        - points (np.ndarray): Input array of points with dimensions nx3.
-        - curvatures (np.ndarray): Array of curvature values.
-        - radii_ma (np.ndarray): Array of radii for moving average.
+        The width parameters `w_ma` and `w_cc` are reduced equally by always reducing the larger of the two.
 
-        Returns:
-        - np.ndarray: Shifted points array with dimensions nx3.
+        Returns
+        -------
+        List[Dict[str, int]]
+            A list of dictionaries, where each dictionary holds the `w_ma` and `w_cc` values.
         """
-        shifted_points = np.zeros_like(points)
+        # Allocate & Initialize
+        descending_width_list = []
+        w_ma_cur = self.w_ma
+        w_cc_cur = self.w_cc
 
-        for i in range(points.shape[0]):
-            shifted_points[i] = points[i] + curvatures[i] * radii_ma[i]
+        while not (w_ma_cur == 0 and w_cc_cur == 0):
+            if w_cc_cur >= w_ma_cur:
+                w_cc_cur -= 1
+            else:
+                w_ma_cur -= 1
+            descending_width_list.append({"w_ma": w_ma_cur, "w_cc": w_cc_cur})
 
-        return shifted_points
-
-    def get_smooth_path(self, points: np.ndarray) -> np.ndarray:
-        """
-        Generate a smooth path based on input points using the CCMA algorithm.
-
-        Parameters:
-        - points (np.ndarray): Input array of points with dimensions nx2 or nx3.
-
-        Returns:
-        - np.ndarray: Smoothed path array with dimensions nx2 or nx3.
-        """
-        # Move from 2D to 3D
-        points = self._get_3d_from_2d(points) if points.shape[1] == 2 else points
-
-        for w_i in range(int(self.w_ccma)):
-            ma_points = self._get_ma_points(points, self.weights_ma[w_i])
-            curvatures = self._get_curvature_vectors(ma_points)
-            alphas = self._get_alphas(ma_points, curvatures)
-            radii_ma = self._get_radii_ma(alphas, self.w_cc, self.weights_cc[w_i])
-            points = self._shift_points(points, curvatures, radii_ma)
-
-        return points
+        return descending_width_list
 
     def _filter(self, points: np.ndarray, w_ma: int, w_cc: int, cc_mode: bool) -> np.ndarray:
         """
