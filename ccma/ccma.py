@@ -371,192 +371,192 @@ class CCMA:
 
         return points
 
-def _filter(self, points: np.ndarray, w_ma: int, w_cc: int, cc_mode: bool) -> np.ndarray:
-    """
-    Perform the CCMA filtering on a set of points.
+    def _filter(self, points: np.ndarray, w_ma: int, w_cc: int, cc_mode: bool) -> np.ndarray:
+        """
+        Perform the CCMA filtering on a set of points.
 
-    Parameters
-    ----------
-    points : np.ndarray
-        Input array of points with dimensions nx3.
-    w_ma : int
-        Width parameter for the moving average.
-    w_cc : int
-        Width parameter for the curvature correction.
-    cc_mode : bool
-        Specifies if curvature correction is active.
+        Parameters
+        ----------
+        points : np.ndarray
+            Input array of points with dimensions nx3.
+        w_ma : int
+            Width parameter for the moving average.
+        w_cc : int
+            Width parameter for the curvature correction.
+        cc_mode : bool
+            Specifies if curvature correction is active.
 
-    Returns
-    -------
-    np.ndarray
-        Filtered points after applying CCMA filtering.
-    """
-    w_ccma = w_ma + w_cc + 1
+        Returns
+        -------
+        np.ndarray
+            Filtered points after applying CCMA filtering.
+        """
+        w_ccma = w_ma + w_cc + 1
 
-    # Calculate moving-average points
-    points_ma = self._get_ma_points(points, self.weights_ma[w_ma])
+        # Calculate moving-average points
+        points_ma = self._get_ma_points(points, self.weights_ma[w_ma])
 
-    if not cc_mode:
-        return points_ma
-
-    # Calculate curvature vectors & curvatures
-    curvature_vectors = self._get_curvature_vectors(points_ma)
-    curvatures = np.linalg.norm(curvature_vectors, axis=1)
-
-    # Calculate alphas (angles defined by two consecutive points defined by the assumption of constant curvature)
-    alphas = self._get_alphas(points_ma, curvatures)
-
-    # Calculate radii
-    radii_ma = self._get_radii_ma(alphas, w_ma, self.weights_ma[w_ma])
-
-    # Allocate
-    points_ccma = np.zeros((points.shape[0] - 2 * w_ccma, 3))
-
-    for idx in range(points.shape[0] - 2 * w_ccma):
-        # Get tangent vector for the shifting point
-        unit_tangent = get_unit_vector(points_ma[w_cc + idx + 1 + 1] - points_ma[w_cc + idx - 1 + 1])
-
-        # Calculate the weighted shift
-        shift = np.zeros(3)
-        for idx_cc in range(2 * w_cc + 1):
-            if curvatures[idx + idx_cc + 1] != 0.0:
-                u = get_unit_vector(curvature_vectors[idx + idx_cc + 1])
-                weight = self.weights_cc[w_cc][idx_cc]
-                shift_magnitude = (1 / curvatures[idx + idx_cc + 1]) * (1 / radii_ma[idx + idx_cc + 1] - 1)
-                shift += u * weight * shift_magnitude
-
-        # Reconstruction
-        points_ccma[idx] = points_ma[idx + w_cc + 1] + np.cross(unit_tangent, shift)
-
-    return points_ccma
-
-def filter(self, points: np.ndarray, mode: str = "padding", cc_mode: bool = True) -> np.ndarray:
-    """
-    Apply filtering to a set of points using a specified mode.
-
-    Parameters
-    ----------
-    points : np.ndarray
-        Input array of points with dimensions nx2 or nx3.
-    mode : str, optional
-        Filtering mode. Options include:
-        - "padding": Pad the first and last points to preserve path length.
-        - "wrapping": Treat points as cyclic (wrapping around).
-        - "fill_boundary": Filter with decreased width parameters to preserve length.
-        - "none": Do not preserve length; no pre-processing.
-    cc_mode : bool, optional
-        Specifies if curvature correction is active.
-
-    Returns
-    -------
-    np.ndarray
-        Filtered points.
-
-    Raises
-    ------
-    ValueError
-        If the 'mode' parameter is not one of "padding", "wrapping", "none", or "fill_boundary".
-    RuntimeError
-        If the number of 'points' is insufficient.
-    """
-    if mode not in ["none", "padding", "wrapping", "fill_boundary"]:
-        raise ValueError(f"Invalid mode! Got :: {mode}. Expected :: none | padding | wrapping | fill_boundary.")
-
-    if points.shape[0] < 3:
-        raise RuntimeError("At least 3 points are necessary for the CCMA-filtering")
-
-    if mode == "padding":
-        n_padding = self.w_ccma if cc_mode else self.w_ma
-        points = np.row_stack((np.tile(points[0], (n_padding, 1)),
-                               points,
-                               np.tile(points[-1], (n_padding, 1))))
-
-    if points.shape[0] < self.w_ccma * 2 + 1:
-        raise RuntimeError("Not enough points are given for complete filtering!")
-
-    if mode == "wrapping":
-        n_padding = self.w_ccma if cc_mode else self.w_ma
-        points = np.row_stack((points[-n_padding:],
-                               points,
-                               points[:n_padding]))
-
-    # Convert 2d points to 3d points (if given as 2d)
-    is_2d = points.shape[1] == 2
-    if is_2d:
-        points = self._get_3d_from_2d(points)
-
-    if not (mode == "fill_boundary"):
-        if is_2d:
-            return self._filter(points, w_ma=self.w_ma, w_cc=self.w_cc, cc_mode=cc_mode)[:, 0:2]
-        return self._filter(points, w_ma=self.w_ma, w_cc=self.w_cc, cc_mode=cc_mode)
-    else:
-        # Define dimension for fast access of relevant dimensions
-        dim = 2 if is_2d else 3
-
-        # Descending filtering for CCMA
-        if cc_mode:
-            points_ccma = np.zeros((points.shape[0], dim))
-            descending_width_list = self._get_descending_width()[::-1]
-
-            # First and last point
-            points_ccma[0] = points[0, 0:dim]
-            points_ccma[-1] = points[-1, 0:dim]
-
-            # Full-filtered points
-            points_ccma[self.w_ccma: points.shape[0] - self.w_ccma] = self._filter(points, self.w_ma, self.w_cc, cc_mode)[:, :dim]
-
-            # Ascending/Descending points
-            for width_set, idx_w in zip(descending_width_list, range(len(descending_width_list))):
-                w_ccma = width_set["w_ma"] + width_set["w_cc"] + 1
-
-                # The following is a design choice!
-                # The second last points are smoothed via MA but are not curvature corrected (you cannot apply both)
-                # The reason is that curvature correction has no effect without MA>0.
-                # Consequently, it is better to smooth the second last point instead of doing nothing.
-                # If, however, global w_ma was set to zero, no MA should be applied (consistency)!
-                use_ma_1 = True if width_set["w_ma"] == 0 and self.w_ma != 0 else False
-
-                # Ascending points
-                points_ccma[idx_w + 1] = self._filter(
-                    points[:idx_w + 1 + w_ccma + 1],
-                    # In case of w_ma==0, do not make curvature correction, but use w_ma==1 instead (this is a design choice)
-                    width_set["w_ma"] if not use_ma_1 else 1,
-                    width_set["w_cc"],
-                    False if use_ma_1 else True)[:, :dim]
-
-                # Descending points
-                points_ccma[-idx_w - 2] = self._filter(
-                    points[-idx_w - 2 - w_ccma:],
-                    # In case of w_ma==0, do not make curvature correction, but use w_ma==1 instead (this is a design choice)
-                    width_set["w_ma"] if not use_ma_1 else 1,
-                    width_set["w_cc"],
-                    False if use_ma_1 else True)[:, :dim]
-
-            return points_ccma
-
-        # Descending filtering for MA without curvature correction
-        else:
-            points_ma = np.zeros((points.shape[0], dim))
-            descending_width_list = list(range(self.w_ma))
-
-            # Full-filtered points
-            points_ma[self.w_ma: points.shape[0] - self.w_ma] = self._filter(points, self.w_ma, 0, False)[:, :dim]
-
-            # Ascending/Descending points
-            for idx, width in zip(descending_width_list, descending_width_list):
-
-                # Ascending points
-                points_ma[idx] = self._filter(
-                    points[:2 * width + 1],
-                    width,
-                    0,
-                    False)[:, :dim]
-
-                # Descending points
-                points_ma[- idx - 1] = self._filter(
-                    points[-2 * width - 1:],
-                    width,
-                    0,
-                    False)[:, :dim]
-
+        if not cc_mode:
             return points_ma
+
+        # Calculate curvature vectors & curvatures
+        curvature_vectors = self._get_curvature_vectors(points_ma)
+        curvatures = np.linalg.norm(curvature_vectors, axis=1)
+
+        # Calculate alphas (angles defined by two consecutive points defined by the assumption of constant curvature)
+        alphas = self._get_alphas(points_ma, curvatures)
+
+        # Calculate radii
+        radii_ma = self._get_radii_ma(alphas, w_ma, self.weights_ma[w_ma])
+
+        # Allocate
+        points_ccma = np.zeros((points.shape[0] - 2 * w_ccma, 3))
+
+        for idx in range(points.shape[0] - 2 * w_ccma):
+            # Get tangent vector for the shifting point
+            unit_tangent = get_unit_vector(points_ma[w_cc + idx + 1 + 1] - points_ma[w_cc + idx - 1 + 1])
+
+            # Calculate the weighted shift
+            shift = np.zeros(3)
+            for idx_cc in range(2 * w_cc + 1):
+                if curvatures[idx + idx_cc + 1] != 0.0:
+                    u = get_unit_vector(curvature_vectors[idx + idx_cc + 1])
+                    weight = self.weights_cc[w_cc][idx_cc]
+                    shift_magnitude = (1 / curvatures[idx + idx_cc + 1]) * (1 / radii_ma[idx + idx_cc + 1] - 1)
+                    shift += u * weight * shift_magnitude
+
+            # Reconstruction
+            points_ccma[idx] = points_ma[idx + w_cc + 1] + np.cross(unit_tangent, shift)
+
+        return points_ccma
+
+    def filter(self, points: np.ndarray, mode: str = "padding", cc_mode: bool = True) -> np.ndarray:
+        """
+        Apply filtering to a set of points using a specified mode.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Input array of points with dimensions nx2 or nx3.
+        mode : str, optional
+            Filtering mode. Options include:
+            - "padding": Pad the first and last points to preserve path length.
+            - "wrapping": Treat points as cyclic (wrapping around).
+            - "fill_boundary": Filter with decreased width parameters to preserve length.
+            - "none": Do not preserve length; no pre-processing.
+        cc_mode : bool, optional
+            Specifies if curvature correction is active.
+
+        Returns
+        -------
+        np.ndarray
+            Filtered points.
+
+        Raises
+        ------
+        ValueError
+            If the 'mode' parameter is not one of "padding", "wrapping", "none", or "fill_boundary".
+        RuntimeError
+            If the number of 'points' is insufficient.
+        """
+        if mode not in ["none", "padding", "wrapping", "fill_boundary"]:
+            raise ValueError(f"Invalid mode! Got :: {mode}. Expected :: none | padding | wrapping | fill_boundary.")
+
+        if points.shape[0] < 3:
+            raise RuntimeError("At least 3 points are necessary for the CCMA-filtering")
+
+        if mode == "padding":
+            n_padding = self.w_ccma if cc_mode else self.w_ma
+            points = np.row_stack((np.tile(points[0], (n_padding, 1)),
+                                points,
+                                np.tile(points[-1], (n_padding, 1))))
+
+        if points.shape[0] < self.w_ccma * 2 + 1:
+            raise RuntimeError("Not enough points are given for complete filtering!")
+
+        if mode == "wrapping":
+            n_padding = self.w_ccma if cc_mode else self.w_ma
+            points = np.row_stack((points[-n_padding:],
+                                points,
+                                points[:n_padding]))
+
+        # Convert 2d points to 3d points (if given as 2d)
+        is_2d = points.shape[1] == 2
+        if is_2d:
+            points = self._get_3d_from_2d(points)
+
+        if not (mode == "fill_boundary"):
+            if is_2d:
+                return self._filter(points, w_ma=self.w_ma, w_cc=self.w_cc, cc_mode=cc_mode)[:, 0:2]
+            return self._filter(points, w_ma=self.w_ma, w_cc=self.w_cc, cc_mode=cc_mode)
+        else:
+            # Define dimension for fast access of relevant dimensions
+            dim = 2 if is_2d else 3
+
+            # Descending filtering for CCMA
+            if cc_mode:
+                points_ccma = np.zeros((points.shape[0], dim))
+                descending_width_list = self._get_descending_width()[::-1]
+
+                # First and last point
+                points_ccma[0] = points[0, 0:dim]
+                points_ccma[-1] = points[-1, 0:dim]
+
+                # Full-filtered points
+                points_ccma[self.w_ccma: points.shape[0] - self.w_ccma] = self._filter(points, self.w_ma, self.w_cc, cc_mode)[:, :dim]
+
+                # Ascending/Descending points
+                for width_set, idx_w in zip(descending_width_list, range(len(descending_width_list))):
+                    w_ccma = width_set["w_ma"] + width_set["w_cc"] + 1
+
+                    # The following is a design choice!
+                    # The second last points are smoothed via MA but are not curvature corrected (you cannot apply both)
+                    # The reason is that curvature correction has no effect without MA>0.
+                    # Consequently, it is better to smooth the second last point instead of doing nothing.
+                    # If, however, global w_ma was set to zero, no MA should be applied (consistency)!
+                    use_ma_1 = True if width_set["w_ma"] == 0 and self.w_ma != 0 else False
+
+                    # Ascending points
+                    points_ccma[idx_w + 1] = self._filter(
+                        points[:idx_w + 1 + w_ccma + 1],
+                        # In case of w_ma==0, do not make curvature correction, but use w_ma==1 instead (this is a design choice)
+                        width_set["w_ma"] if not use_ma_1 else 1,
+                        width_set["w_cc"],
+                        False if use_ma_1 else True)[:, :dim]
+
+                    # Descending points
+                    points_ccma[-idx_w - 2] = self._filter(
+                        points[-idx_w - 2 - w_ccma:],
+                        # In case of w_ma==0, do not make curvature correction, but use w_ma==1 instead (this is a design choice)
+                        width_set["w_ma"] if not use_ma_1 else 1,
+                        width_set["w_cc"],
+                        False if use_ma_1 else True)[:, :dim]
+
+                return points_ccma
+
+            # Descending filtering for MA without curvature correction
+            else:
+                points_ma = np.zeros((points.shape[0], dim))
+                descending_width_list = list(range(self.w_ma))
+
+                # Full-filtered points
+                points_ma[self.w_ma: points.shape[0] - self.w_ma] = self._filter(points, self.w_ma, 0, False)[:, :dim]
+
+                # Ascending/Descending points
+                for idx, width in zip(descending_width_list, descending_width_list):
+
+                    # Ascending points
+                    points_ma[idx] = self._filter(
+                        points[:2 * width + 1],
+                        width,
+                        0,
+                        False)[:, :dim]
+
+                    # Descending points
+                    points_ma[- idx - 1] = self._filter(
+                        points[-2 * width - 1:],
+                        width,
+                        0,
+                        False)[:, :dim]
+
+                return points_ma
