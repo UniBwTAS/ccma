@@ -145,7 +145,7 @@ class CCMA:
         self.weights_cc = self._get_weights(w_cc, self.distrib_cc, rho_cc)
 
     @staticmethod
-    def _get_weights(w: float, distrib: str, rho: float):
+    def _get_weights(w: float, distrib: str, rho: float) -> List[np.ndarray]:
         """
         Generate weights based on the specified distribution and parameters.
 
