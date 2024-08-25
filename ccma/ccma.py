@@ -248,7 +248,7 @@ class CCMA:
             if curvatures[idx] != 0.0:
                 radius = 1 / curvatures[idx]
                 dist_neighbors = np.linalg.norm(points[idx + 1] - points[idx - 1])
-                alphas[idx] = np.sin((dist_neighbors / 2) / radius)
+                alphas[idx] = np.arcsin((dist_neighbors / 2) / radius)
             else:
                 alphas[idx] = 0.0
 
