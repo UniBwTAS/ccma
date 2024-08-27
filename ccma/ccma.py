@@ -121,8 +121,8 @@ class CCMA:
 
         Example:
         ```python
-        smoothing_filter = SmoothingFilter(w_ma=5, w_cc=3, distrib="normal",
-                                           rho_ma=0.99, rho_cc=0.95)
+        ccma_instance = CCMA(w_ma=5, w_cc=3, distrib="normal",
+                             rho_ma=0.99, rho_cc=0.95)
         ```
         """
 
@@ -187,7 +187,7 @@ class CCMA:
 
         Example:
         ```python
-        weights = SmoothingFilter._get_weights(w=3, distrib="normal", rho=0.95)
+        weights = ccma_instance._get_weights(w=3, distrib="normal", rho=0.95)
         ```
         This example generates a list of kernels using a normal distribution with
         a base width of 3 and a truncation area of 95%.
@@ -316,7 +316,7 @@ class CCMA:
         ```python
         points = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12]])
         weights = np.array([0.25, 0.5, 0.25])
-        smoothed_points = SmoothingFilter._get_ma_points(points, weights)
+        smoothed_points = ccma_instance._get_ma_points(points, weights)
         # smoothed_points is now array([[4., 5., 6.],
         #                               [7., 8., 9.]])
         ```
@@ -350,7 +350,7 @@ class CCMA:
         Example:
         ```python
         points = np.array([[0, 0, 0], [1, 1, 0], [2, 0, 0], [3, -1, 0]])
-        curvature_vectors = SmoothingFilter._get_curvature_vectors(points)
+        curvature_vectors = ccma_instance._get_curvature_vectors(points)
         # curvature_vectors is now array([[0., 0., 0.],
         #                                 [0., 0., 1.],
         #                                 [0., 0., -1.],
@@ -458,7 +458,7 @@ class CCMA:
         alphas = np.array([0.1, 0.5, 0.5, 0.1])
         w_ma = 2
         weights = np.array([0.25, 0.5, 0.25])
-        radii_ma = SmoothingFilter._get_normalized_ma_radii(alphas, w_ma, weights)
+        radii_ma = ccma_instance._get_normalized_ma_radii(alphas, w_ma, weights)
         # radii_ma is now array([0.35, 0.65, 0.65, 0.35])
         ```
         """
@@ -500,7 +500,7 @@ class CCMA:
 
         Example:
             ```python
-            descending_widths = SmoothingFilter._get_descending_width()
+            descending_widths = ccma_instance._get_descending_width()
             # descending_widths is now [{'w_ma': 5, 'w_cc': 2}, {'w_ma': 4, 'w_cc': 2}, ...]
             ```
         """
