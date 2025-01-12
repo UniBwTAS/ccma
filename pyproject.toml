@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ccma"
+version = "1.0.0"
+description = "Curvature Corrected Moving Average: An accurate and model-free path smoothing algorithm."
+authors = [
+    { name = "Thomas Steinecker", email = "thomas.steinecker@unibw.de" }
+]
+readme = "README.md"
+requires-python = ">=3.6"
+license = { file = "LICENSE" }
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/UniBwTAS/ccma"
+
+[tool.setuptools]
+package-dir = {"" = "ccma"}
