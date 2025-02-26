@@ -97,13 +97,6 @@ After a successful installation, ensure the correctness of the setup by followin
     >>> import ccma
     ```
 
-4. Confirm the version number to ensure a successful installation:
-
-    ```python
-    >>> ccma.__version__
-    "1.0.0"
-    ```
-
 ### HowTo Guide
 
 Further information can be found in the [HowTo Guide](./docs/HowTo.md).
