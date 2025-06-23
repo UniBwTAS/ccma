@@ -4,12 +4,12 @@ from ccma import CCMA
 
 # Create a noisy 2d-path
 n = 100
-sigma = 0.05
+sigma = 0.075
 points = np.array([2.0 * np.cos(np.linspace(0, 2 * np.pi, n)),
                    np.sin(np.linspace(0, 6 * np.pi, n))]).T + np.random.normal(0, sigma, (n, 2))
 
 # Create the CCMA-filter object
-w_ma = 4
+w_ma = 6
 w_cc = 2
 ccma = CCMA(w_ma, w_cc, distrib="hanning")
 
