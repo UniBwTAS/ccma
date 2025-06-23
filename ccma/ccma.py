@@ -455,11 +455,11 @@ class CCMA:
 
         Example:
         ```python
-        alphas = np.array([0.1, 0.5, 0.5, 0.1])
-        w_ma = 2
+        alphas = np.array([0.1, 1.0, 1.0, 0.5, 0.1, 0.2])
+        w_ma = 1
         weights = np.array([0.25, 0.5, 0.25])
         radii_ma = ccma_instance._get_normalized_ma_radii(alphas, w_ma, weights)
-        # radii_ma is now array([0.35, 0.65, 0.65, 0.35])
+        # radii_ma is now array([0.   0.77015115 0.77015115 0.93879128 0.99750208 0. ])
         ```
         """
 
