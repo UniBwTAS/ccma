@@ -38,6 +38,8 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 }
 ```
 
+And if you find this repository useful, I’d greatly appreciate it if you gave it a ⭐ on GitHub — it helps others discover the project and supports further development!
+
 ### Quick Links
 
 + [Minimal Working Example](#minimal-working-example)
