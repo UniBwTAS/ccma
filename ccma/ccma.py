@@ -145,8 +145,6 @@ class CCMA:
         self.weights_ma = self._get_weights(w_ma, self.distrib_ma, rho_ma)
         self.weights_cc = self._get_weights(w_cc, self.distrib_cc, rho_cc)
 
-        print("Initialized CCMA")
-
     @staticmethod
     def _get_weights(w, distrib, rho):
         """
