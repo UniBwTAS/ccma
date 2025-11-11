@@ -145,6 +145,8 @@ class CCMA:
         self.weights_ma = self._get_weights(w_ma, self.distrib_ma, rho_ma)
         self.weights_cc = self._get_weights(w_cc, self.distrib_cc, rho_cc)
 
+        print("Initialized CCMA")
+
     @staticmethod
     def _get_weights(w, distrib, rho):
         """
@@ -619,6 +621,14 @@ class CCMA:
         - ValueError: If the 'mode' parameter is not one of "padding", "wrapping", "none", or "fill_boundary".
         - RuntimeError: If the number of 'points' is insufficient.
         """
+
+        # Handle edge case for synthetic data:
+        # - Synthetic datasets are often perfectly linear.
+        # - A straight line has no well-defined normal vector (unlike a curved line).
+        # - To avoid numerical issues, add a tiny amount of random noise.
+        # - Note: This is a temporary workaround; ideally, the code should check
+        #   whether a normal vector can be computed before proceeding.
+        points = points + np.random.uniform(0, 1e-9, points.shape)
 
         if mode not in ["none", "padding", "wrapping", "fill_boundary"]:
             raise ValueError("Invalid mode! Got :: {mode}. Expected :: none | padding | wrapping | fill_boundary.")
