@@ -5,10 +5,10 @@ from ccma import CCMA
 
 # Create a noisy 2d-path
 n = 100
-sigma = 0.1
+sigma = 0.075
 points = np.array([2.0 * np.cos(np.linspace(0, 2 * np.pi, n)),
-                   np.sin(np.linspace(0, 4 * np.pi, n)),
-                   np.linspace(0, 2, n)]).T + np.random.normal(0, sigma, (n, 3))
+                   np.sin(np.linspace(0, 6 * np.pi, n)),
+                   np.linspace(0, 4, n)]).T + np.random.normal(0, sigma, (n, 3))
 
 # Create the CCMA-filter object
 w_ma = 6
@@ -27,13 +27,13 @@ ax = fig.add_subplot(111, projection='3d')
 
 # Plot the path
 ax.plot(points[:, 0], points[:, 1], points[:, 2], "r-o", linewidth=1, alpha=0.25, markersize=5, label="original")
-ax.plot(ma_points[:, 0], ma_points[:, 1], ma_points[:, 2], linewidth=1, alpha=0.75, color="green", label=f"ma-smoothed ({w_ma})")
-ax.plot(ccma_points[:, 0], ccma_points[:, 1], ccma_points[:, 2], linewidth=1, alpha=1., color="orange",
+ax.plot(ma_points[:, 0], ma_points[:, 1], ma_points[:, 2], linewidth=1, alpha=0.5, color="green", label=f"ma-smoothed ({w_ma})")
+ax.plot(ccma_points[:, 0], ccma_points[:, 1], ccma_points[:, 2], linewidth=5, alpha=0.5, color="orange",
         label=f"ccma-smoothed with padding ({w_ma}, {w_cc})")
 ax.plot(ccma_points_wo_padding[:, 0],
         ccma_points_wo_padding[:, 1],
         ccma_points_wo_padding[:, 2],
-        linewidth=1, alpha=0.5, color="b", label=f"ccma-smoothed ({w_ma}, {w_cc})")
+        linewidth=2, alpha=0.5, color="b", label=f"ccma-smoothed ({w_ma}, {w_cc})")
 
 # Set labels and title
 ax.set_xlabel('X')
