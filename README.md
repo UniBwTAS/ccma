@@ -40,6 +40,7 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 
 And if you find this repository useful, I’d greatly appreciate it if you gave it a ⭐ on GitHub — it helps others discover the project and supports further development!
 
+
 ### Quick Links
 
 + [Minimal Working Example](#minimal-working-example)
@@ -68,6 +69,7 @@ noisy_points = points + noise
 ccma = CCMA(w_ma=5, w_cc=3)
 smoothed_points = ccma.filter(noisy_points)
 ```
+
 
 ### Installation 
 
@@ -99,12 +101,13 @@ After a successful installation, ensure the correctness of the setup by followin
     >>> import ccma
     ```
 
+
 ### HowTo Guide
 
 Further information can be found in the [HowTo Guide](./docs/HowTo.md).
 
-### CCMA for Path Interpolation
 
+### CCMA for Path Interpolation
 
 The CCMA was designed for smoothing noisy paths; 
 however, due to its advantageous characteristics and simple usage, 
@@ -141,6 +144,7 @@ An illustrative example can also be found in the list of examples.
 
 ![alt text](./figures/ccma_vs_bspline.png "B-Spline vs. CCMA + B-Spline")
 
+
 ### Interactive Example for Better Understanding
 
 
@@ -152,12 +156,13 @@ Finally, you can zoom in and move around,
 facilitating a more profound understanding. 
 We hope you find this tool helpful.
 
+
 ### Savitzky–Golay Filter vs CCMA
 
-The Savitzky-Golay Filter (SGF) is a popular choice for smoothing time data. Yet, we found that when using it for paths, it has weaker smoothing capabilities as the CCMA. In the video below, a visual comparison is made between the CCMA and the SGF. Both approaches have a comparable widow size of 19 and yet we can see that the CCMA has better smoothing capabilities. 
+The Savitzky–Golay Filter (SGF) is a well-known method for smoothing time-series data. However, when applied to spatial paths, it often exhibits weaker smoothing performance compared to the Curvature-Corrected Moving Average (CCMA).
+The video below provides a visual comparison of both approaches. Despite using a comparable window size of 19, the CCMA achieves smoother, more consistent path reconstruction than the SGF.
 
-
-![alt text](./figures/savgal_vs_ccma.gif "Savitzky-Golay Filter vs CCMA")
+![alt text](./figures/savgol_vs_ccma.gif "Savitzky-Golay Filter vs CCMA")
 
 
 ### Further Research Ideas
