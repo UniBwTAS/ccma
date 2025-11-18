@@ -162,8 +162,9 @@ We hope you find this tool helpful.
 The Savitzky–Golay Filter (SGF) is a well-known method for smoothing time-series data. However, when applied to spatial paths, it often exhibits weaker smoothing performance compared to the Curvature-Corrected Moving Average (CCMA).
 The video below provides a visual comparison of both approaches. Despite using a comparable window size of 19, the CCMA achieves smoother, more consistent path reconstruction than the SGF.
 
-![alt text](./figures/savgol_vs_ccma.gif "Savitzky-Golay Filter vs CCMA")
-
+<p align="center">
+  <img src="./figures/savgol_vs_ccma.gif" />
+</p>
 
 ### Further Research Ideas
 
