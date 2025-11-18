@@ -152,8 +152,12 @@ Finally, you can zoom in and move around,
 facilitating a more profound understanding. 
 We hope you find this tool helpful.
 
+### Savitzky–Golay Filter vs CCMA
 
-![alt text](./figures/interactive_example.gif "Interactive Example")
+The Savitzky-Golay Filter (SGF) is a popular choice for smoothing time data. Yet, we found that when using it for paths, it has weaker smoothing capabilities as the CCMA. In the video below, a visual comparison is made between the CCMA and the SGF. Both approaches have a comparable widow size of 19 and yet we can see that the CCMA has better smoothing capabilities. 
+
+
+![alt text](./figures/savgal_vs_ccma.gif "Savitzky-Golay Filter vs CCMA")
 
 
 ### Further Research Ideas
