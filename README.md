@@ -163,7 +163,7 @@ The Savitzky–Golay Filter (SGF) is a well-known method for smoothing time-seri
 The video below provides a visual comparison of both approaches. Despite using a comparable window size of 19, the CCMA achieves smoother, more consistent path reconstruction than the SGF.
 
 <p align="center">
-  <img src="./figures/savgol_vs_ccma.gif" />
+  <img src="./figures/savgol_vs_ccma.gif" width="100%">
 </p>
 
 ### Further Research Ideas
