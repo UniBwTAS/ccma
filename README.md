@@ -15,8 +15,8 @@ However, due to its symmetric approach, it primarily serves as accurate smoothin
 
 The implementation offers a user-friendly experience (see minimal working examle), 
 making it remarkably easy to apply filtering to given points represented as a numpy array. 
-Users can effortlessly choose from different kernels, including truncated normal, hanning, 
-uniform, or the sophisticated Pascal's triangle kernel (default).
+Users can effortlessly choose from different kernels, including truncated normal, hanning (default), 
+uniform, or Pascal's triangle kernel.
 
 Furthermore, the implementation provides different boundary behaviors—padding, wrapping, decreasing filtering width, 
 or using no boundary strategy at all. 
@@ -38,7 +38,7 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 }
 ```
 
-And if you find this repository useful, I’d greatly appreciate it if you gave it a ⭐ on GitHub — it helps others discover the project and supports further development!
+And if you find this repository useful, I’d greatly appreciate it if you gave it a ⭐ on GitHub!
 
 
 ### Quick Links
@@ -65,7 +65,7 @@ points = np.array([np.cos(np.linspace(0, 2*np.pi, n)),
                    np.sin(np.linspace(0, 2*np.pi, n))]).T
 noisy_points = points + noise
 
-# Create ccma-object and smooth points by using padding (default) and Pascal's Triangle kernel/weights (default)
+# Create ccma-object and smooth points by using padding (default) and Hanning kernel/weights (default)
 ccma = CCMA(w_ma=5, w_cc=3)
 smoothed_points = ccma.filter(noisy_points)
 ```
@@ -167,7 +167,9 @@ facilitating a more profound understanding.
 We hope you find this tool helpful.
 
 
-![alt text](./figures/interactive_example.gif "Interactive Example")
+<p align="center">
+  <img src="./figures/interactive_example.gif" width="100%">
+</p>
 
 ### Further Research Ideas
 

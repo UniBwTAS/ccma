@@ -83,7 +83,7 @@ def get_unit_vector(vec):
 
 
 class CCMA:
-    def __init__(self, w_ma=5, w_cc=3, distrib="pascal", distrib_ma=None, distrib_cc=None, rho_ma=0.95, rho_cc=0.95):
+    def __init__(self, w_ma=5, w_cc=3, distrib="hanning", distrib_ma=None, distrib_cc=None, rho_ma=0.99, rho_cc=0.99):
         """
         Initialize the SmoothingFilter object with specified parameters for
         smoothing and curvature correction.
@@ -97,19 +97,19 @@ class CCMA:
             - "normal": Truncated normal distribution with specified truncation
               area (see `rho_ma` and `rho_cc`).
             - "pascal": Kernel based on rows of Pascal's triangle, a discretized
-              version of the normal distribution. (Default is "pascal")
+              version of the normal distribution.
             - "hanning": A common kernel in signal processing, less accurate but
-              offers good smoothing characteristics.
+              offers good smoothing characteristics. (Default is "hanning")
         - distrib_ma (str, optional): Type of kernel used only for moving average
           (ma). Defaults to `distrib` if not specified.
         - distrib_cc (str, optional): Type of kernel used only for curvature
           correction (cc). Defaults to `distrib` if not specified.
         - rho_ma (float, optional): Truncation area for the normal distribution in
           the moving average. Relevant only if `distrib` or `distrib_ma` is
-          "normal". (Default is 0.95)
+          "normal". (Default is 0.99)
         - rho_cc (float, optional): Truncation area for the normal distribution in
           the curvature correction. Relevant only if `distrib` or `distrib_cc` is
-          "normal". (Default is 0.95)
+          "normal". (Default is 0.99)
 
         Notes:
         - The `distrib` parameter specifies the type of kernel used for filtering;
