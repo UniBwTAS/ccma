@@ -38,9 +38,6 @@ If you use the CCMA, please consider citing the original [paper](https://ieeexpl
 }
 ```
 
-And if you find this repository useful, I’d greatly appreciate it if you gave it a ⭐ on GitHub!
-
-
 ### Quick Links
 
 + [Minimal Working Example](#minimal-working-example)
@@ -48,6 +45,7 @@ And if you find this repository useful, I’d greatly appreciate it if you gave 
 + [HowTo Guide](#howto-guide)
 + [CCMA for Path Interpolation](#ccma-for-path-interpolation)
 + [Splines vs. CCMA](#splines-vs-ccma)
++ [Savitzky-Golay Filter vs. CCMA](#savitzkygolay-filter-vs-ccma)
 + [Interactive Example for Better Understanding](#interactive-example-for-better-understanding)
 + [Further Research Ideas](#further-research-ideas)
 + [Star History](#star-history)
@@ -145,7 +143,7 @@ An illustrative example can also be found in the list of examples.
 ![alt text](./figures/ccma_vs_bspline.png "B-Spline vs. CCMA + B-Spline")
 
 
-### Savitzky–Golay Filter vs CCMA
+### Savitzky–Golay Filter vs. CCMA
 
 The Savitzky–Golay Filter (SGF) is a well-known method for smoothing time-series data. However, when applied to spatial paths, it often exhibits weaker smoothing performance compared to the Curvature-Corrected Moving Average (CCMA).
 The video below provides a visual comparison of both approaches. Despite using a comparable window size of 19, the CCMA achieves smoother, more consistent path reconstruction than the SGF.
